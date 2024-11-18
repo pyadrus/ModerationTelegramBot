@@ -1,1 +1,3 @@
 aiogram
+loguru
+python-dotenv

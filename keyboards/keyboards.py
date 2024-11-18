@@ -6,7 +6,7 @@ def link_to_channel(channel_name):
     try:
         rows = [
             [
-                InlineKeyboardButton(text="Подписаться на канал", url=f"t.me/{channel_name}")
+                InlineKeyboardButton(text="Подписаться на канал", url=f"https://t.me/{channel_name}")
             ],
         ]
         link_to_channel = InlineKeyboardMarkup(inline_keyboard=rows)

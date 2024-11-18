@@ -1,19 +1,39 @@
-async def ban(chatid, channelid, cur, con):
-    cur.execute('SELECT * FROM channel WHERE chat_id = ?', (chatid,))
-    data_chat = cur.fetchone()
+import sqlite3
+
+def ban(chatid, channelid):
+    # Подключение к базе данных SQLite3
+    con = sqlite3.connect("data/db.db")
+    # Создание курсора для выполнения запросов
+    cursor = con.cursor()
+
+    # Создание таблицы 'channel', если её не существует
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS channel (
+            chat_id INTEGER PRIMARY KEY,
+            channel_id INTEGER,
+            block INTEGER DEFAULT 0
+        )
+    ''')
+
+    cursor.execute('SELECT * FROM channel WHERE chat_id = ?', (chatid,))
+    data_chat = cursor.fetchone()
     if data_chat is None:
-        cur.execute('INSERT INTO channel (chat_id, channel_id) VALUES(?, ?)', (chatid, channelid))
+        cursor.execute('INSERT INTO channel (chat_id, channel_id) VALUES(?, ?)', (chatid, channelid))
         con.commit()
     else:
-        cur.execute('UPDATE channel set block = 1, channel_id = ? WHERE chat_id = ?', (channelid, chatid))
+        cursor.execute('UPDATE channel set block = 1, channel_id = ? WHERE chat_id = ?', (channelid, chatid))
         con.commit()
 
-async def unban(chatid, channelid, cur, con):
-    cur.execute('SELECT * FROM channel WHERE chat_id = ?', (chatid,))
-    data_chat = cur.fetchone()
+
+def unban(chatid, channelid):
+    con = sqlite3.connect("data/db.db")
+    cursor = con.cursor()
+
+    cursor.execute('SELECT * FROM channel WHERE chat_id = ?', (chatid,))
+    data_chat = cursor.fetchone()
     if data_chat is not None:
-        cur.execute('UPDATE channel set block = 0 WHERE chat_id = ?', (chatid, ))
+        cursor.execute('UPDATE channel set block = 0 WHERE chat_id = ?', (chatid,))
         con.commit()
     else:
-        cur.execute('INSERT INTO channel (chat_id, channel_id, block) VALUES(?, ?, ?)', (chatid, channelid, '0'))
+        cursor.execute('INSERT INTO channel (chat_id, channel_id, block) VALUES(?, ?, ?)', (chatid, channelid, '0'))
         con.commit()

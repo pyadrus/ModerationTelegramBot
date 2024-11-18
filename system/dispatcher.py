@@ -8,6 +8,5 @@ bot = Bot(token=bot_token)
 storage = MemoryStorage()  # Хранилище
 dp = Dispatcher(storage=storage)
 
-
 router = Router()
 dp.include_router(router)

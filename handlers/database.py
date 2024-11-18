@@ -1,5 +1,3 @@
-import asyncio
-
 async def ban(chatid, channelid, cur, con):
     cur.execute('SELECT * FROM channel WHERE chat_id = ?', (chatid,))
     data_chat = cur.fetchone()

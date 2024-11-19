@@ -25,15 +25,14 @@ async def block_cmd(message: types.Message):
     logger.info(chat_member)
     if chat_member.status not in ["administrator", "creator"]:
         # Если пользователь не является админом, отправляем ему сообщение с предупреждением
-        await bot.send_message(chat_id, "Команда доступна только для администраторов.")
+        await bot.send_message(chat_id, "Команда доступна только для администраторов.", parse_mode="html")
         await message.delete()  # Удаляем сообщение с командой /block
         return
-
     try:
         ban(chatid=message.chat.id, channelid=message.text.split("@")[1])
-        await message.answer("<b>Обязательная подписка на канал для чата включена!</b>")
+        await message.answer("<b>Обязательная подписка на канал для чата включена!</b>", parse_mode="html")
     except IndexError:
-        await message.answer("<b>Не указан ID канала. Используйте /block @channel_id</b>")
+        await message.answer("<b>Не указан ID канала. Используйте /block @channel</b>", parse_mode="html")
 
 @router.message(Command(commands=["unblock"]))
 async def unblock_cmd(message: types.Message):
@@ -50,12 +49,14 @@ async def unblock_cmd(message: types.Message):
     logger.info(chat_member)
     if chat_member.status not in ["administrator", "creator"]:
     # Если пользователь не является админом, отправляем ему сообщение с предупреждением
-        await bot.send_message(chat_id, "Команда доступна только для администраторов.")
+        await bot.send_message(chat_id, "Команда доступна только для администраторов.", parse_mode="html")
         await message.delete()  # Удаляем сообщение с командой /unblock
         return
-    unban(chatid=message.chat.id, channelid=message.text.split("@")[1], )
-    await message.answer(f"<b>Обязательная подписка на канал для чата выключена!</b>")
-
+    try:
+        unban(chatid=message.chat.id, channelid=message.text.split("@")[1], )
+        await message.answer(f"<b>Обязательная подписка на канал для чата выключена!</b>", parse_mode="html")
+    except IndexError:
+        await message.answer("<b>Не указан ID канала. Используйте /unblock @channel</b>", parse_mode="html")
 
 async def delete_message(message: types.Message, delay: int):
     """_summary_
@@ -107,9 +108,7 @@ async def check_to_block(message: types.Message):
         except Exception as e:
             print(f"Ошибка при создании таблицы: {e}")
 
-        cursor.execute(
-            "SELECT * FROM channel WHERE chat_id = ?", (message.chat.id,)
-        )
+        cursor.execute("SELECT * FROM channel WHERE chat_id = ?", (message.chat.id,))
         info = cursor.fetchone()
         if info is not None:
             channel_id = info[1]  # ID канала
@@ -117,9 +116,7 @@ async def check_to_block(message: types.Message):
 
             # Проверяем, включен ли блок (должно быть block == 1)
             if block == 1:
-                user_channel_status = await bot.get_chat_member(
-                    chat_id=f"@{channel_id}", user_id=message.from_user.id
-                )
+                user_channel_status = await bot.get_chat_member(chat_id=f"@{channel_id}", user_id=message.from_user.id)
                 if user_channel_status.status == "left":
                     # Код для вывода сообщения пользователю, который не подписан на канал
                     admin_link = hlink("админу", f"tg://user?id={457407212}")
@@ -130,11 +127,9 @@ async def check_to_block(message: types.Message):
                         f"<b>Чтобы писать в данном чате необходимо подписаться на канал.</b>"
                         f"\n<b>По вопросом рекламы в данной группе и многих других обращаться к {admin_link}</b>",
                         reply_markup=link_to_channel(info[1]),
-                    )
+                    parse_mode="html")
                     # удаляем сообщение через 1 минуту
-                    asyncio.create_task(
-                        delete_message(deleted_message, time_delete_messages)
-                    )
+                    asyncio.create_task(delete_message(deleted_message, time_delete_messages))
 
 
 async def main() -> None:

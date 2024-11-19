@@ -1,9 +1,10 @@
 from aiogram import Bot, Dispatcher, Router
 from aiogram.fsm.storage.memory import MemoryStorage
-from settings.settings import bot_token
+
+from settings import get_bot_token
 
 # Установка подключения к Telegram с использованием токена
-bot = Bot(token=bot_token)
+bot = Bot(token=get_bot_token())
 
 # Инициализация хранилища для состояния бота (в данном случае используется MemoryStorage)
 storage = MemoryStorage()  # Хранилище для временного хранения состояний в памяти

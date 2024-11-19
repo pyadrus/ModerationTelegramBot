@@ -10,8 +10,8 @@ from loguru import logger
 
 from handlers import ban, unban
 from keyboards import link_to_channel
-from settings.settings import time_delete_messages
-from system.dispatcher import dp, bot, router
+from settings import get_time_delete_messages
+from system import router, bot, dp
 
 
 @router.message(Command(commands=["block"]))
@@ -157,7 +157,7 @@ async def check_to_block(message: types.Message):
                         parse_mode="html"
                     )
                     # Удаляем уведомление через 1 минуту
-                    asyncio.create_task(delete_message(deleted_message, time_delete_messages))
+                    asyncio.create_task(delete_message(deleted_message, get_time_delete_messages()))
 
 
 async def main() -> None:

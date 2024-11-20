@@ -30,4 +30,4 @@ def link_to_channel(channel_name):
         return link_to_channel
     except Exception as e:
         # Логируем ошибку, если она возникла
-        logger.error(f"Ошибка: {e}")
+        logger.exception(f"Ошибка: {e}")
